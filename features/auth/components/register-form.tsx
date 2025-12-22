@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { authClient } from '@/lib/auth-client';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 const registerSchema = z
   .object({
@@ -43,19 +44,22 @@ export const RegisterForm = () => {
   });
 
   const onSubmit = async (values: RegisterFormValues) => {
-    const { data, error } = await authClient.signUp.email({
-      name: values.email,
-      email: values.email,
-      password: values.password,
-      callbackURL: '/',
-    }, {
-      onSuccess: () => {
-        router.push("/")
+    const { data, error } = await authClient.signUp.email(
+      {
+        name: values.email,
+        email: values.email,
+        password: values.password,
+        callbackURL: '/',
       },
-      onError: (ctx) => {
-        toast.error(ctx.error.message)
+      {
+        onSuccess: () => {
+          router.push('/');
+        },
+        onError: ctx => {
+          toast.error(ctx.error.message);
+        },
       }
-    });
+    );
   };
 
   const isPending = form.formState.isSubmitting;
@@ -73,9 +77,11 @@ export const RegisterForm = () => {
               <div className="grid gap-6">
                 <div className="flex flex-col gap-4">
                   <Button variant="outline" className="w-full" type="button" disabled={isPending}>
+                    <Image src="/logos/github.svg" alt="github-logo" width={20} height={20} />
                     Continue with Github
                   </Button>
                   <Button variant="outline" className="w-full" type="button" disabled={isPending}>
+                    <Image src="/logos/google.svg" alt="google-logo" width={20} height={20} />
                     Continue with Google
                   </Button>
                 </div>
