@@ -1,0 +1,10 @@
+
+
+
+
+==========    Polar notes  =======================================
+  We are implementing polar with better-auth not nextjs directly.
+
+  By doing so, when user signup in better-auth, the user gets listed as customer
+  in the polar dashboard also.
+  neon(database)=>user=>id === polar.customer => extenalId
