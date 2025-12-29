@@ -1,0 +1,37 @@
+
+
+
+
+==========    Polar notes  =======================================
+  We are implementing polar with better-auth not nextjs directly.
+
+  By doing so, when user signup in better-auth, the user gets listed as customer
+  in the polar dashboard also.
+  neon(database)=>user=>id === polar.customer => extenalId
+
+
+=============  Workflow Page =================================
+
+Page has : <WorkflowContainer>
+               <WorkflowList/> 
+           </WorkflowContainer>
+
+ //features/workflow/components/workflow.tsx
+export WorkflowList: fetch all workflows, render it.
+export WorkflowHeader: wraps and returns EntityHeader
+export WorkflowContainer: wraps and returns EntitiyContainer and WorkflowHeader
+
+  //componets/entity-components.tsx
+export EntityContainer:
+export EntityHeader:
+
+<WorkflowContainer>
+  <EntitiyContainer>
+    <WorkflowHeader>
+      <EntityHeader/>
+    </WorkflowHeader>
+    <WrokflowList/>
+  </EntitiyContainer>
+</WorkflowContainer>
+
+
