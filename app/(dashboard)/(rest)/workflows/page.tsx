@@ -1,4 +1,9 @@
-import { WorkflowsContainer, WrokflowsList } from '@/features/workflows/components/workflows';
+import {
+  WorkflowsContainer,
+  WorkflowsError,
+  WorkflowsLoading,
+  WrokflowsList,
+} from '@/features/workflows/components/workflows';
 import { workflowsParamsLoader } from '@/features/workflows/server/params-loader';
 import { prefetchWorkflows } from '@/features/workflows/server/prefetch';
 import { requireAuth } from '@/lib/auth-utils';
@@ -16,13 +21,16 @@ const Page = async ({ searchParams }: Props) => {
 
   //Don't use the below line of code as validator
   const params = await workflowsParamsLoader(searchParams);
-  prefetchWorkflows(params);
+  
+  // Skip prefetching - let client-side handle it with proper auth
+  // prefetchWorkflows(params);
+  //TODO: fix this prefethign error
 
   return (
     <WorkflowsContainer>
       <HydrateClient>
-        <ErrorBoundary fallback={<p>Error!</p>}>
-          <Suspense fallback={<p>Loading....</p>}>
+        <ErrorBoundary fallback={<WorkflowsError />}>
+          <Suspense fallback={<WorkflowsLoading />}>
             <WrokflowsList />
           </Suspense>
         </ErrorBoundary>
