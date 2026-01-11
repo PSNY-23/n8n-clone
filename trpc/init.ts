@@ -3,38 +3,48 @@ import { polarClient } from '@/lib/polar';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { headers } from 'next/headers';
 import { cache } from 'react';
-export const createTRPCContext = cache(async () => {
+import superjson from 'superjson';
+
+type TRPCContext = {
+  session: Awaited<ReturnType<typeof auth.api.getSession>> | null;
+};
+
+export const createTRPCContext = cache(async (): Promise<TRPCContext> => {
   /**
    * @see: https://trpc.io/docs/server/context
    */
-  return { userId: 'user_123' };
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  return { session };
 });
 // Avoid exporting the entire t-object
 // since it's not very descriptive.
 // For instance, the use of a t variable
 // is common in i18n libraries.
-const t = initTRPC.create({
+const t = initTRPC.context<TRPCContext>().create({
   /**
    * @see https://trpc.io/docs/server/data-transformers
    */
-  // transformer: superjson,
+  transformer: superjson,
 });
 // Base router and procedure helpers
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const baseProcedure = t.procedure;
 export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-  if (!session) {
+  // During server-side rendering, ensure we have a session
+  // If session is null, the user is not authenticated
+  if (!ctx.session) {
+    // Log for debugging
+    console.error('No session found in protectedProcedure context');
     throw new TRPCError({
       code: 'UNAUTHORIZED',
-      message: 'Unauthorized',
+      message: 'You must be logged in to perform this action',
     });
   }
   return next({
-    ctx: { ...ctx, auth: session },
+    ctx: { ...ctx, auth: ctx.session },
   });
 });
 
